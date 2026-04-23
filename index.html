@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Draft Dek Hockey</title>
+
+<style>
+body {
+  background: #0a0a0a;
+  color: white;
+  font-family: Arial;
+  text-align: center;
+}
+
+h1 {
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+
+h2 {
+  font-size: 35px;
+}
+
+.timer {
+  font-size: 90px;
+  margin: 20px;
+  color: red;
+}
+
+button {
+  padding: 12px 20px;
+  margin: 5px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.player {
+  margin: 5px;
+  padding: 10px;
+  background: #222;
+  cursor: pointer;
+}
+
+.player:hover {
+  background: #444;
+}
+
+.container {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.list {
+  width: 30%;
+}
+
+.team {
+  margin-top: 20px;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>DRAFT OFFICIEL</h1>
+
+<h2 id="captain">Francois Fortin</h2>
+
+<div class="timer" id="timer">45</div>
+
+<button onclick="start()">▶️ Start</button>
+<button onclick="pause()">⏸️ Pause</button>
+<button onclick="resetTimer()">🔄 Reset</button>
+
+<div class="container">
+
+  <div class="list">
+    <h3>Joueurs disponibles</h3>
+    <div id="players"></div>
+  </div>
+
+  <div class="list">
+    <h3>Dernier choix</h3>
+    <div id="lastPick">Aucun</div>
+  </div>
+
+  <div class="list">
+    <h3>Équipes</h3>
+
+    <div class="team"><b>Olivier Breton</b><br><span id="team0">Cédric Bégin</span></div>
+    <div class="team"><b>Jordan Fecteau</b><br><span id="team1">Alexis Gagné</span></div>
+    <div class="team"><b>Francis Quirion</b><br><span id="team2">Pierre-Luc Lapointe</span></div>
+    <div class="team"><b>Michael Breton</b><br><span id="team3">Alexandre Carrier</span></div>
+    <div class="team"><b>William Gilbert</b><br><span id="team4">Justin Richard</span></div>
+    <div class="team"><b>Francois Fortin</b><br><span id="team5">Miguel Goupil</span></div>
+
+  </div>
+
+</div>
+
+<script>
+
+let time = 45;
+let interval;
+let currentTeam = 5;
+
+// ordre serpentin
+let order = [5,4,3,2,1,0,0,1,2,3,4,5];
+
+function updateTimer(){
+  document.getElementById("timer").innerText = time;
+}
+
+function start(){
+  clearInterval(interval);
+  interval = setInterval(()=>{
+    time--;
+    updateTimer();
+    if(time<=0) clearInterval(interval);
+  },1000);
+}
+
+function pause(){
+  clearInterval(interval);
+}
+
+function resetTimer(){
+  time = 45;
+  updateTimer();
+}
+
+function nextPick(){
+  currentTeam++;
+  if(currentTeam >= order.length) return;
+
+  let teamIndex = order[currentTeam];
+  let names = ["Olivier Breton","Jordan Fecteau","Francis Quirion","Michael Breton","William Gilbert","Francois Fortin"];
+  document.getElementById("captain").innerText = names[teamIndex];
+
+  time = 45;
+  updateTimer();
+}
+
+let players = [
+"Olivier Beaudoin",
+"Cedric Begin",
+"Mickael Boisvert",
+"Anthony Bolduc",
+"Maxime Cloutier",
+"Yannick Coulombe",
+"Alexis Coulombe",
+"David Coulombe",
+"Jordan Feteau",
+"Michael Filion",
+"Sébastien Fortin (G)",
+"Tommy Lachance",
+"Pier-Olivier Morin",
+"Pier-Olivier Paradis (G)",
+"Cedric Plante",
+"Pier-Olivier Poulin",
+"Cedric Quirion",
+"Phillippe Quirion",
+"Raphael Quirion",
+"Francis Quirion",
+"Anthony Roy",
+"Samel Roy-Boucher",
+"Steeven Tardif (G)",
+"Dylan Pépin",
+"Frédéric Poulin",
+"Keven Fecteau",
+"Yannick Tardif",
+"Nathan Paradis (G)",
+"Xavier Arguin",
+"Olivier Roy",
+"Stéphane Roy",
+"Maxime Labonté (G)",
+"Keven Couture"
+];
+
+function renderPlayers(){
+  let div = document.getElementById("players");
+  div.innerHTML="";
+
+  players.forEach((p,i)=>{
+    let el = document.createElement("div");
+    el.className="player";
+    el.innerText=p;
+
+    el.onclick=()=>{
+      let teamIndex = order[currentTeam];
+
+      let teamDiv = document.getElementById("team"+teamIndex);
+      teamDiv.innerHTML += "<br>" + p;
+
+      document.getElementById("lastPick").innerText = p;
+
+      players.splice(i,1);
+      renderPlayers();
+
+      nextPick();
+    };
+
+    div.appendChild(el);
+  });
+}
+
+renderPlayers();
+updateTimer();
+
+</script>
+
+</body>
+</html>
