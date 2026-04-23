@@ -54,6 +54,7 @@
     border-radius: 999px;
     font-weight: 700;
     box-shadow: 0 0 18px rgba(25,118,210,0.35);
+    text-align: center;
   }
 
   .main {
@@ -103,15 +104,23 @@
   .captain-name {
     font-size: 44px;
     font-weight: 900;
-    margin: 0 0 16px 0;
+    margin: 0 0 8px 0;
     line-height: 1.05;
+  }
+
+  .next-pick {
+    margin-top: 10px;
+    font-size: 18px;
+    color: #9fb3d1;
+    font-weight: 700;
+    letter-spacing: 1px;
   }
 
   .team-color-line {
     width: 120px;
     height: 8px;
     border-radius: 999px;
-    margin: 0 auto 20px;
+    margin: 16px auto 20px;
     background: #1e88e5;
     box-shadow: 0 0 18px rgba(255,255,255,0.2);
   }
@@ -317,7 +326,7 @@
       <small>Soirée du draft</small>
       <h1>DRAFT OFFICIEL</h1>
     </div>
-    <div class="pick-badge" id="pickDisplay">Choix 2</div>
+    <div class="pick-badge" id="pickDisplay">Ronde 2 • Choix 7</div>
   </div>
 
   <div class="main">
@@ -326,14 +335,15 @@
       <div class="panel-body clock-card">
         <div class="on-clock">ON THE CLOCK</div>
         <div class="captain-name" id="captain">Francois Fortin</div>
+        <div class="next-pick">Prochain : <span id="nextCaptain">---</span></div>
         <div class="team-color-line" id="teamColorLine"></div>
-        <div class="timer" id="timer">45</div>
+        <div class="timer" id="timer">02:00</div>
 
         <div class="controls">
-          <button class="btn-primary" onclick="start()">▶ Démarrer</button>
-          <button class="btn-secondary" onclick="pauseTimer()">⏸ Pause</button>
-          <button class="btn-secondary" onclick="resetTimer()">↺ Reset</button>
-          <button class="btn-danger" onclick="nextPickManual()">⏭ Passer</button>
+          <button class="btn-primary" onclick="if(!spectatorMode) start()">▶ Démarrer</button>
+          <button class="btn-secondary" onclick="if(!spectatorMode) pauseTimer()">⏸ Pause</button>
+          <button class="btn-secondary" onclick="if(!spectatorMode) resetTimer()">↺ Reset</button>
+          <button class="btn-danger" onclick="if(!spectatorMode) nextPickManual()">⏭ Passer</button>
         </div>
       </div>
     </div>
@@ -410,7 +420,10 @@
   </div>
 
 <script>
-  let time = 45;
+  const DEFAULT_TIME = 120;
+  const spectatorMode = window.location.search.includes("spectateur");
+
+  let time = DEFAULT_TIME;
   let interval = null;
   let currentPick = 0;
 
@@ -426,7 +439,7 @@
   // Ordre serpentin après la ronde 1
   const order = [5,4,3,2,1,0,0,1,2,3,4,5];
 
-  // Joueurs disponibles seulement
+  // Joueurs disponibles seulement (sans les 6 déjà choisis)
   let players = [
     { name: "Olivier Beaudoin", pos: "A" },
     { name: "Mickael Boisvert", pos: "A" },
@@ -482,6 +495,16 @@
     { name: "Keven Couture", pos: "A" }
   ];
 
+  window.addEventListener("DOMContentLoaded", () => {
+    if (spectatorMode) {
+      document.querySelectorAll("button").forEach(btn => {
+        btn.style.display = "none";
+      });
+      document.querySelector(".footer-note").innerText =
+        "Mode spectateur : affichage seulement.";
+    }
+  });
+
   function renderTeams() {
     for (let i = 0; i < teams.length; i++) {
       const teamDiv = document.getElementById("team" + i);
@@ -499,22 +522,41 @@
   function updateCurrentCaptain() {
     if (currentPick >= order.length) {
       document.getElementById("captain").innerText = "Draft terminé";
-      document.getElementById("pickDisplay").innerText = "Terminé";
+      document.getElementById("pickDisplay").innerText = "Repêchage terminé";
+      document.getElementById("nextCaptain").innerText = "---";
       document.getElementById("teamColorLine").style.background = "#888";
+      document.getElementById("teamColorLine").style.boxShadow = "0 0 18px #888";
       return;
     }
 
     const teamIndex = order[currentPick];
     const team = teams[teamIndex];
+
+    const overallPick = 7 + currentPick;
+    const roundNumber = Math.floor((overallPick - 1) / 6) + 1;
+
+    let nextText = "---";
+    if (currentPick + 1 < order.length) {
+      const nextTeamIndex = order[currentPick + 1];
+      nextText = teams[nextTeamIndex].name;
+    }
+
     document.getElementById("captain").innerText = team.name;
-    document.getElementById("pickDisplay").innerText = "Choix " + (currentPick + 2);
+    document.getElementById("nextCaptain").innerText = nextText;
+    document.getElementById("pickDisplay").innerText =
+      "Ronde " + roundNumber + " • Choix " + overallPick;
+
     document.getElementById("teamColorLine").style.background = team.color;
     document.getElementById("teamColorLine").style.boxShadow = "0 0 18px " + team.color;
   }
 
   function updateTimer() {
     const timerEl = document.getElementById("timer");
-    timerEl.innerText = time;
+    const minutes = Math.floor(time / 60);
+    const seconds = time % 60;
+
+    timerEl.innerText =
+      String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
 
     if (time <= 10) {
       timerEl.classList.add("warning");
@@ -543,14 +585,14 @@
 
   function resetTimer() {
     clearInterval(interval);
-    time = 45;
+    time = DEFAULT_TIME;
     updateTimer();
   }
 
   function nextPickManual() {
     clearInterval(interval);
     currentPick++;
-    time = 45;
+    time = DEFAULT_TIME;
     updateTimer();
     updateCurrentCaptain();
   }
@@ -565,6 +607,7 @@
       el.innerHTML = `${player.name}<small>Position : ${player.pos}</small>`;
 
       el.onclick = () => {
+        if (spectatorMode) return;
         if (currentPick >= order.length) return;
 
         const teamIndex = order[currentPick];
@@ -578,7 +621,7 @@
         renderTeams();
 
         clearInterval(interval);
-        time = 45;
+        time = DEFAULT_TIME;
         updateTimer();
 
         currentPick++;
