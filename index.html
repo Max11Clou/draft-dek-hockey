@@ -60,7 +60,7 @@
   .main {
     padding: 24px;
     display: grid;
-    grid-template-columns: 1.1fr 1fr 1.3fr;
+    grid-template-columns: 1.05fr 1.15fr 1.3fr;
     gap: 20px;
   }
 
@@ -126,7 +126,7 @@
   }
 
   .timer {
-    font-size: 100px;
+    font-size: 92px;
     font-weight: 900;
     line-height: 1;
     margin: 10px 0 14px 0;
@@ -177,15 +177,26 @@
     color: white;
   }
 
-  .last-pick-box {
-    min-height: 110px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    font-size: 30px;
-    font-weight: 800;
-    line-height: 1.2;
+  .history-box {
+    min-height: 220px;
+    max-height: 620px;
+    overflow-y: auto;
+    text-align: left;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+
+  .history-item {
+    background: rgba(255,255,255,0.06);
+    border-left: 4px solid rgba(255,255,255,0.18);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+  }
+
+  .history-item strong {
+    color: #8db8ff;
   }
 
   .players-list {
@@ -349,9 +360,9 @@
     </div>
 
     <div class="panel">
-      <div class="panel-header">Dernier choix</div>
+      <div class="panel-header">Derniers choix</div>
       <div class="panel-body">
-        <div class="last-pick-box" id="lastPick">Aucun choix</div>
+        <div class="history-box" id="lastPickList"></div>
       </div>
     </div>
 
@@ -439,6 +450,16 @@
   // Ordre serpentin après la ronde 1
   const order = [5,4,3,2,1,0,0,1,2,3,4,5];
 
+  // Historique initial des 6 premiers choix
+  let pickHistory = [
+    "Olivier Breton sélectionne Cédric Bégin",
+    "Jordan Fecteau sélectionne Alexis Gagné",
+    "Francis Quirion sélectionne Pierre-Luc Lapointe",
+    "Michael Breton sélectionne Alexandre Carrier",
+    "William Gilbert sélectionne Justin Richard",
+    "Francois Fortin sélectionne Miguel Goupil"
+  ];
+
   // Joueurs disponibles seulement (sans les 6 déjà choisis)
   let players = [
     { name: "Olivier Beaudoin", pos: "A" },
@@ -517,6 +538,21 @@
         teamDiv.appendChild(el);
       });
     }
+  }
+
+  function renderPickHistory() {
+    const box = document.getElementById("lastPickList");
+    box.innerHTML = "";
+
+    const recentPicks = pickHistory.slice().reverse();
+
+    recentPicks.forEach((pick, index) => {
+      const overallNumber = pickHistory.length - index;
+      const el = document.createElement("div");
+      el.className = "history-item";
+      el.innerHTML = `<strong>Choix ${overallNumber}</strong> — ${pick}`;
+      box.appendChild(el);
+    });
   }
 
   function updateCurrentCaptain() {
@@ -613,12 +649,12 @@
         const teamIndex = order[currentPick];
         teams[teamIndex].picks.push(player.name);
 
-        document.getElementById("lastPick").innerText =
-          teams[teamIndex].name + " sélectionne " + player.name;
+        pickHistory.push(teams[teamIndex].name + " sélectionne " + player.name);
 
         players.splice(i, 1);
         renderPlayers();
         renderTeams();
+        renderPickHistory();
 
         clearInterval(interval);
         time = DEFAULT_TIME;
@@ -634,6 +670,7 @@
 
   renderTeams();
   renderPlayers();
+  renderPickHistory();
   updateTimer();
   updateCurrentCaptain();
 </script>
