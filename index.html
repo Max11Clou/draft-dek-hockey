@@ -1,670 +1,962 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Draft Dek Hockey</title>
-<style>
-  * {
-    box-sizing: border-box;
-  }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Draft Dek Hockey</title>
+  <style>
+    * { box-sizing: border-box; }
 
-  body {
-    margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
-    color: white;
-    background:
-      radial-gradient(circle at top, rgba(33, 94, 168, 0.25), transparent 35%),
-      linear-gradient(180deg, #0a1220 0%, #05080f 100%);
-  }
-
-  .topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 18px 28px;
-    border-bottom: 1px solid rgba(255,255,255,0.12);
-    background: rgba(255,255,255,0.03);
-    backdrop-filter: blur(6px);
-  }
-
-  .brand {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .brand small {
-    color: #9fb3d1;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    font-size: 12px;
-  }
-
-  .brand h1 {
-    margin: 0;
-    font-size: 34px;
-    font-weight: 900;
-    letter-spacing: 1px;
-  }
-
-  .pick-badge {
-    background: linear-gradient(135deg, #0d47a1, #1976d2);
-    padding: 10px 18px;
-    border-radius: 999px;
-    font-weight: 700;
-    box-shadow: 0 0 18px rgba(25,118,210,0.35);
-    text-align: center;
-  }
-
-  .main {
-    padding: 24px;
-    display: grid;
-    grid-template-columns: 1.05fr 1.15fr 1.3fr;
-    gap: 20px;
-  }
-
-  .panel {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.10);
-    border-radius: 18px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-    overflow: hidden;
-  }
-
-  .panel-header {
-    padding: 14px 18px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: #9fb3d1;
-    font-weight: 700;
-    background: rgba(255,255,255,0.03);
-  }
-
-  .panel-body {
-    padding: 18px;
-  }
-
-  .clock-card {
-    text-align: center;
-    padding: 12px 10px 22px;
-  }
-
-  .on-clock {
-    font-size: 14px;
-    color: #8db8ff;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    margin-bottom: 8px;
-    font-weight: 700;
-  }
-
-  .captain-name {
-    font-size: 44px;
-    font-weight: 900;
-    margin: 0 0 8px 0;
-    line-height: 1.05;
-  }
-
-  .next-pick {
-    margin-top: 10px;
-    font-size: 18px;
-    color: #9fb3d1;
-    font-weight: 700;
-    letter-spacing: 1px;
-  }
-
-  .team-color-line {
-    width: 120px;
-    height: 8px;
-    border-radius: 999px;
-    margin: 16px auto 20px;
-    background: #1e88e5;
-    box-shadow: 0 0 18px rgba(255,255,255,0.2);
-  }
-
-  .timer {
-    font-size: 92px;
-    font-weight: 900;
-    line-height: 1;
-    margin: 10px 0 14px 0;
-    letter-spacing: 2px;
-  }
-
-  .timer.warning {
-    color: #ff4d4d;
-    text-shadow: 0 0 16px rgba(255,77,77,0.45);
-  }
-
-  .controls {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 12px;
-  }
-
-  button {
-    border: none;
-    border-radius: 12px;
-    padding: 12px 18px;
-    cursor: pointer;
-    font-size: 15px;
-    font-weight: 700;
-    transition: 0.18s ease;
-  }
-
-  button:hover {
-    transform: translateY(-1px);
-    filter: brightness(1.05);
-  }
-
-  .btn-primary {
-    background: linear-gradient(135deg, #1976d2, #42a5f5);
-    color: white;
-  }
-
-  .btn-secondary {
-    background: #1a2230;
-    color: white;
-    border: 1px solid rgba(255,255,255,0.12);
-  }
-
-  .btn-danger {
-    background: linear-gradient(135deg, #9c1c1c, #d32f2f);
-    color: white;
-  }
-
-  .history-box {
-    min-height: 220px;
-    max-height: 620px;
-    overflow-y: auto;
-    text-align: left;
-    font-size: 16px;
-    font-weight: 700;
-    line-height: 1.4;
-  }
-
-  .history-item {
-    background: rgba(255,255,255,0.06);
-    border-left: 4px solid rgba(255,255,255,0.18);
-    border-radius: 10px;
-    padding: 10px 12px;
-    margin-bottom: 10px;
-  }
-
-  .history-item strong {
-    color: #8db8ff;
-  }
-
-  .players-list {
-    max-height: 620px;
-    overflow-y: auto;
-    padding-right: 6px;
-  }
-
-  .player {
-    background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 14px;
-    padding: 12px 14px;
-    margin-bottom: 10px;
-    cursor: pointer;
-    text-align: left;
-    font-weight: 700;
-    transition: 0.18s ease;
-  }
-
-  .player:hover {
-    background: linear-gradient(180deg, rgba(66,165,245,0.22), rgba(255,255,255,0.08));
-    border-color: rgba(66,165,245,0.45);
-    transform: translateX(2px);
-  }
-
-  .player small {
-    display: block;
-    margin-top: 4px;
-    color: #a9bdd8;
-    font-weight: 500;
-  }
-
-  .bottom {
-    padding: 0 24px 24px;
-  }
-
-  .teams-grid {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 16px;
-  }
-
-  .team-card {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.10);
-    border-radius: 18px;
-    overflow: hidden;
-    min-height: 240px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.28);
-  }
-
-  .team-header {
-    padding: 14px 12px;
-    font-weight: 900;
-    font-size: 18px;
-    text-align: center;
-    color: white;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .team-sub {
-    display: block;
-    font-size: 12px;
-    font-weight: 700;
-    opacity: 0.9;
-    margin-top: 4px;
-    letter-spacing: 1px;
-  }
-
-  .team-body {
-    padding: 14px;
-  }
-
-  .pick {
-    background: rgba(255,255,255,0.07);
-    border-left: 4px solid rgba(255,255,255,0.18);
-    border-radius: 10px;
-    padding: 10px 10px;
-    margin-bottom: 10px;
-    font-size: 14px;
-    line-height: 1.25;
-    font-weight: 700;
-  }
-
-  .pick-number {
-    color: #9fb3d1;
-    display: block;
-    font-size: 11px;
-    margin-bottom: 4px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-
-  .footer-note {
-    text-align: center;
-    color: #90a4c0;
-    font-size: 13px;
-    margin-top: 14px;
-  }
-
-  @media (max-width: 1400px) {
-    .teams-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-
-  @media (max-width: 1100px) {
-    .main {
-      grid-template-columns: 1fr;
+    :root{
+      --bg1:#04101f;
+      --bg2:#06162b;
+      --panel:#071120;
+      --line:rgba(120,170,255,.18);
+      --text:#f4f7fb;
+      --muted:#8ca6c8;
+      --blue:#1e63ff;
+      --blue2:#4da3ff;
+      --red:#c51c2b;
+      --green:#38d430;
+      --yellow:#d7a500;
+      --orange:#c96b12;
+      --black:#20242c;
     }
 
-    .teams-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  @media (max-width: 700px) {
-    .teams-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .captain-name {
-      font-size: 34px;
+    body{
+      margin:0;
+      color:var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(38,110,255,.16), transparent 30%),
+        linear-gradient(180deg, #071225 0%, #020814 100%);
+      min-height:100vh;
     }
 
-    .timer {
-      font-size: 72px;
+    .shell{
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 18px 14px 24px;
     }
-  }
-</style>
+
+    .topbar{
+      display:grid;
+      grid-template-columns: 220px 1fr 220px;
+      align-items:center;
+      gap:16px;
+      margin-bottom:16px;
+    }
+
+    .logoBox{
+      height:96px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:linear-gradient(180deg, rgba(8,23,46,.94), rgba(4,11,23,.94));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      box-shadow: inset 0 0 24px rgba(55,110,255,.08);
+    }
+
+    .logoBox .logoText{
+      font-weight:900;
+      line-height:1;
+      letter-spacing:1px;
+      text-transform:uppercase;
+      font-size:30px;
+    }
+
+    .logoBox .logoText small{
+      display:block;
+      font-size:14px;
+      color:#b8cfff;
+      margin-top:6px;
+      letter-spacing:2px;
+    }
+
+    .roundBanner{
+      height:96px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:
+        linear-gradient(180deg, rgba(8,23,46,.94), rgba(4,11,23,.94));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+      overflow:hidden;
+      box-shadow: inset 0 0 30px rgba(55,110,255,.08);
+    }
+
+    .roundBanner::before,
+    .roundBanner::after{
+      content:"";
+      position:absolute;
+      top:0;
+      width:140px;
+      height:100%;
+      background:linear-gradient(135deg, transparent 30%, rgba(38,110,255,.16) 50%, transparent 70%);
+      opacity:.35;
+    }
+
+    .roundBanner::before{ left:-40px; transform:skewX(-25deg); }
+    .roundBanner::after{ right:-40px; transform:skewX(25deg); }
+
+    .roundBanner span{
+      font-size:40px;
+      font-weight:900;
+      letter-spacing:2px;
+      text-transform:uppercase;
+      z-index:1;
+    }
+
+    .rightSpacer{ height:96px; }
+
+    .mainGrid{
+      display:grid;
+      grid-template-columns: 360px 1fr 410px;
+      gap:16px;
+      align-items:start;
+    }
+
+    .panel{
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:linear-gradient(180deg, rgba(6,18,36,.96), rgba(2,8,20,.96));
+      overflow:hidden;
+      box-shadow: inset 0 0 18px rgba(70,120,255,.05);
+    }
+
+    .panelHeader{
+      padding:16px 18px;
+      font-size:15px;
+      font-weight:900;
+      letter-spacing:2px;
+      text-transform:uppercase;
+      color:#eef4ff;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+    }
+
+    .panelBody{ padding:18px; }
+
+    .leftPanel .onClock{
+      color:#3b87ff;
+      font-size:22px;
+      text-transform:uppercase;
+      font-weight:900;
+      letter-spacing:1px;
+      text-align:center;
+      margin-top:6px;
+    }
+
+    .captainName{
+      text-align:center;
+      font-size:36px;
+      font-weight:900;
+      text-transform:uppercase;
+      margin:18px 0 8px;
+      line-height:1.05;
+    }
+
+    .teamNameCurrent{
+      text-align:center;
+      font-size:22px;
+      font-weight:900;
+      text-transform:uppercase;
+      margin-bottom:14px;
+    }
+
+    .teamLine{
+      width:78%;
+      height:10px;
+      border-radius:999px;
+      margin:0 auto 18px;
+      background:var(--green);
+      box-shadow:0 0 14px rgba(56,212,48,.45);
+    }
+
+    .nextPick{
+      text-align:center;
+      font-size:18px;
+      text-transform:uppercase;
+      font-weight:800;
+      color:#c8d7ee;
+      margin-bottom:18px;
+    }
+
+    .nextPick span{
+      color:#2f83ff;
+    }
+
+    .timer{
+      text-align:center;
+      font-size:92px;
+      line-height:1;
+      font-weight:900;
+      letter-spacing:2px;
+      margin:18px 0 18px;
+    }
+
+    .timer.warning{
+      color:#ff4a4a;
+      text-shadow:0 0 18px rgba(255,74,74,.4);
+    }
+
+    .btnGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
+
+    button{
+      border:none;
+      cursor:pointer;
+      color:#fff;
+      font-weight:800;
+      text-transform:uppercase;
+      border-radius:12px;
+      padding:16px 14px;
+      font-size:15px;
+      transition:.18s ease;
+    }
+
+    button:hover{ transform:translateY(-1px); filter:brightness(1.06); }
+
+    .btnBlue{ background:linear-gradient(180deg, #0d58e8, #0a43b2); }
+    .btnDark{ background:linear-gradient(180deg, #2a3442, #1a212d); }
+    .btnRed{ background:linear-gradient(180deg, #b31f2e, #84101d); }
+    .btnGreen{ background:linear-gradient(180deg, #1b9b2a, #12751f); }
+
+    .btnFull{
+      width:100%;
+      margin-top:12px;
+    }
+
+    .lastPickBox{
+      min-height:258px;
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:16px;
+      padding:24px 18px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      text-align:center;
+      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+      box-shadow: inset 0 0 18px rgba(255,255,255,.02);
+    }
+
+    .lastPickNumber{
+      font-size:24px;
+      color:#3f8fff;
+      font-weight:900;
+      margin-bottom:8px;
+    }
+
+    .lastPickText{
+      font-size:22px;
+      font-weight:800;
+      line-height:1.45;
+      max-width: 90%;
+    }
+
+    .lastPickPlayer{
+      margin-top:14px;
+      font-size:34px;
+      font-weight:900;
+      text-transform:uppercase;
+      color:var(--green);
+      line-height:1.05;
+    }
+
+    .playersWrap{
+      display:grid;
+      grid-template-rows: 1fr auto;
+      gap:14px;
+    }
+
+    .playersList{
+      max-height:500px;
+      overflow:auto;
+      padding-right:6px;
+    }
+
+    .playerRow{
+      display:grid;
+      grid-template-columns: 1fr 34px;
+      gap:12px;
+      align-items:center;
+      margin-bottom:10px;
+      padding:12px 14px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02));
+      cursor:pointer;
+      transition:.15s ease;
+    }
+
+    .playerRow:hover{
+      border-color: rgba(79,139,255,.45);
+      background:linear-gradient(180deg, rgba(38,110,255,.15), rgba(255,255,255,.03));
+    }
+
+    .playerRow.selected{
+      border-color: rgba(79,139,255,.72);
+      box-shadow: 0 0 18px rgba(38,110,255,.18);
+      background:linear-gradient(180deg, rgba(38,110,255,.22), rgba(255,255,255,.05));
+    }
+
+    .playerName{
+      font-size:18px;
+      font-weight:700;
+    }
+
+    .pos{
+      text-align:center;
+      font-size:16px;
+      font-weight:900;
+    }
+
+    .pos-A{ color:#4ad55f; }
+    .pos-D{ color:#2f83ff; }
+    .pos-G{ color:#ff3f3f; }
+    .pos-M{ color:#d7d7d7; }
+
+    .selectionCard{
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:16px;
+      background:linear-gradient(180deg, rgba(4,18,40,.95), rgba(3,12,25,.95));
+    }
+
+    .selectionTitle{
+      text-align:center;
+      color:#2f83ff;
+      font-weight:900;
+      text-transform:uppercase;
+      margin-bottom:10px;
+      letter-spacing:1px;
+    }
+
+    .selectionPlayer{
+      text-align:center;
+      font-size:24px;
+      font-weight:900;
+      text-transform:uppercase;
+      color:#4d93ff;
+      margin-bottom:16px;
+      line-height:1.15;
+    }
+
+    .selectionBtns{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
+
+    .teamsSection{
+      margin-top:16px;
+    }
+
+    .teamsGrid{
+      display:grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap:12px;
+    }
+
+    .teamCard{
+      border:1px solid var(--line);
+      border-radius:16px;
+      overflow:hidden;
+      background:linear-gradient(180deg, rgba(6,18,36,.96), rgba(2,8,20,.96));
+      min-height:390px;
+    }
+
+    .teamHeader{
+      padding:16px 12px 14px;
+      text-align:center;
+      font-weight:900;
+      text-transform:uppercase;
+      font-size:20px;
+      line-height:1.05;
+    }
+
+    .teamCaptain{
+      display:block;
+      font-size:15px;
+      margin-top:8px;
+      font-weight:700;
+      opacity:.96;
+    }
+
+    .teamBody{
+      padding:14px 16px 18px;
+    }
+
+    .pickLine{
+      font-size:18px;
+      line-height:1.55;
+      margin-bottom:3px;
+      color:#edf3ff;
+    }
+
+    .footNote{
+      margin-top:16px;
+      text-align:center;
+      color:#a7bbd8;
+      text-transform:uppercase;
+      font-size:14px;
+      letter-spacing:1px;
+    }
+
+    .announcementOverlay{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      background:rgba(2,8,18,.72);
+      backdrop-filter: blur(4px);
+      z-index:9999;
+    }
+
+    .announcementOverlay.show{
+      display:flex;
+    }
+
+    .announcementCard{
+      width:min(900px, 86vw);
+      border-radius:22px;
+      border:2px solid rgba(120,180,255,.32);
+      background:
+        radial-gradient(circle at top, rgba(90,165,255,.22), transparent 28%),
+        linear-gradient(180deg, #07162b 0%, #05101f 100%);
+      box-shadow: 0 0 50px rgba(55,110,255,.26);
+      text-align:center;
+      padding:26px 22px 24px;
+      transform:scale(.72);
+      opacity:0;
+      overflow:hidden;
+      position:relative;
+    }
+
+    .announcementOverlay.show .announcementCard{
+      animation: revealDraft .55s ease-out forwards;
+    }
+
+    @keyframes revealDraft{
+      0%{ opacity:0; transform:scale(.72); }
+      60%{ opacity:1; transform:scale(1.03); }
+      100%{ opacity:1; transform:scale(1); }
+    }
+
+    .announcementLights{
+      height:88px;
+      margin:-8px -8px 10px;
+      position:relative;
+      background:
+        radial-gradient(circle at 10% 20%, rgba(255,255,255,.85), rgba(255,255,255,0) 18%),
+        radial-gradient(circle at 24% 8%, rgba(120,180,255,.75), rgba(255,255,255,0) 18%),
+        radial-gradient(circle at 50% 10%, rgba(255,255,255,.85), rgba(255,255,255,0) 18%),
+        radial-gradient(circle at 76% 8%, rgba(120,180,255,.75), rgba(255,255,255,0) 18%),
+        radial-gradient(circle at 90% 20%, rgba(255,255,255,.85), rgba(255,255,255,0) 18%);
+      opacity:.95;
+    }
+
+    .announcementKicker{
+      font-size:24px;
+      font-weight:900;
+      text-transform:uppercase;
+      font-style:italic;
+      letter-spacing:1px;
+      margin-bottom:8px;
+    }
+
+    .announcementTeam{
+      font-size:80px;
+      line-height:.95;
+      font-weight:900;
+      text-transform:uppercase;
+      font-style:italic;
+      margin-bottom:6px;
+      text-shadow:0 0 22px rgba(56,212,48,.24);
+    }
+
+    .announcementSub{
+      font-size:28px;
+      font-weight:900;
+      text-transform:uppercase;
+      font-style:italic;
+      margin-bottom:18px;
+    }
+
+    .announcementPlayer{
+      display:inline-block;
+      min-width:78%;
+      padding:16px 22px;
+      border-radius:16px;
+      border:2px solid rgba(79,139,255,.25);
+      background:linear-gradient(180deg, rgba(35,54,77,.72), rgba(20,34,52,.72));
+      font-size:66px;
+      font-weight:900;
+      text-transform:uppercase;
+      font-style:italic;
+      line-height:1;
+      color:#fff;
+      box-shadow: inset 0 0 18px rgba(255,255,255,.05), 0 0 18px rgba(56,212,48,.16);
+    }
+
+    .announcementFooterLogo{
+      margin-top:18px;
+      font-size:32px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:1px;
+    }
+
+    .announcementFooterLogo small{
+      display:block;
+      font-size:14px;
+      color:#c9d8ef;
+      margin-top:4px;
+      letter-spacing:2px;
+    }
+
+    @media (max-width: 1300px){
+      .mainGrid{ grid-template-columns:1fr; }
+      .teamsGrid{ grid-template-columns: repeat(3,1fr); }
+    }
+
+    @media (max-width: 900px){
+      .topbar{ grid-template-columns:1fr; }
+      .roundBanner span{ font-size:28px; }
+      .teamsGrid{ grid-template-columns: repeat(2,1fr); }
+      .announcementTeam{ font-size:52px; }
+      .announcementSub{ font-size:20px; }
+      .announcementPlayer{ font-size:42px; min-width:90%; }
+    }
+
+    @media (max-width: 650px){
+      .teamsGrid{ grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
+  <div class="shell">
+    <div class="topbar">
+      <div class="logoBox">
+        <div class="logoText">Draft<small>Dek Hockey</small></div>
+      </div>
 
-  <div class="topbar">
-    <div class="brand">
-      <small>Soirée du draft</small>
-      <h1>DRAFT OFFICIEL</h1>
+      <div class="roundBanner">
+        <span id="pickDisplay">Ronde 2 • Choix 7</span>
+      </div>
+
+      <div class="rightSpacer"></div>
     </div>
-    <div class="pick-badge" id="pickDisplay">Ronde 2 • Choix 7</div>
+
+    <div class="mainGrid">
+      <div class="panel leftPanel">
+        <div class="panelHeader">Capitaine au repêchage</div>
+        <div class="panelBody">
+          <div class="onClock">On the clock</div>
+          <div class="captainName" id="captain">Francois Fortin</div>
+          <div class="teamNameCurrent" id="teamNameCurrent">Les Verts</div>
+          <div class="teamLine" id="teamColorLine"></div>
+          <div class="nextPick">Prochain : <span id="nextCaptain">Olivier Breton</span></div>
+          <div class="timer" id="timer">02:00</div>
+
+          <div class="btnGrid">
+            <button class="btnBlue" onclick="start()">▶ Démarrer</button>
+            <button class="btnDark" onclick="pauseTimer()">▌▌ Pause</button>
+            <button class="btnDark" onclick="resetTimer()">⟳ Reset timer</button>
+            <button class="btnRed" onclick="nextPickManual()">⏭ Passer</button>
+          </div>
+
+          <button class="btnRed btnFull" onclick="resetDraft()">⟳ Reset draft</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panelHeader">Dernier choix</div>
+        <div class="panelBody">
+          <div class="lastPickBox">
+            <div class="lastPickNumber" id="lastPickNumber">Choix 6</div>
+            <div class="lastPickText" id="lastPickText">Les Verts sont fiers de sélectionner</div>
+            <div class="lastPickPlayer" id="lastPickPlayer">Miguel Goupil</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panelHeader">Joueurs disponibles</div>
+        <div class="panelBody playersWrap">
+          <div class="playersList" id="players"></div>
+
+          <div class="selectionCard">
+            <div class="selectionTitle">Joueur sélectionné</div>
+            <div class="selectionPlayer" id="selectedPlayerName">---</div>
+            <div class="selectionBtns">
+              <button class="btnGreen" onclick="confirmPick()">✓ Confirmer le choix</button>
+              <button class="btnDark" onclick="cancelPick()">✕ Annuler</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="teamsSection">
+      <div class="teamsGrid">
+        <div class="teamCard">
+          <div class="teamHeader" style="background:linear-gradient(180deg,#1149c9,#0d2d80);">
+            Les Bleus
+            <span class="teamCaptain">Olivier Breton</span>
+          </div>
+          <div class="teamBody" id="team0"></div>
+        </div>
+
+        <div class="teamCard">
+          <div class="teamHeader" style="background:linear-gradient(180deg,#bc1828,#7d0f1a);">
+            Les Rouges
+            <span class="teamCaptain">Jordan Fecteau</span>
+          </div>
+          <div class="teamBody" id="team1"></div>
+        </div>
+
+        <div class="teamCard">
+          <div class="teamHeader" style="background:linear-gradient(180deg,#2a2f39,#11151d);">
+            Les Noirs
+            <span class="teamCaptain">Francis Quirion</span>
+          </div>
+          <div class="teamBody" id="team2"></div>
+        </div>
+
+        <div class="teamCard">
+          <div class="teamHeader" style="background:linear-gradient(180deg,#ba6112,#7b3d05);">
+            Les Oranges
+            <span class="teamCaptain">Michael Breton</span>
+          </div>
+          <div class="teamBody" id="team3"></div>
+        </div>
+
+        <div class="teamCard">
+          <div class="teamHeader" style="background:linear-gradient(180deg,#c59a0a,#8e6c04);">
+            Les Jaunes
+            <span class="teamCaptain">William Gilbert</span>
+          </div>
+          <div class="teamBody" id="team4"></div>
+        </div>
+
+        <div class="teamCard">
+          <div class="teamHeader" style="background:linear-gradient(180deg,#0f7f21,#085313);">
+            Les Verts
+            <span class="teamCaptain">Francois Fortin</span>
+          </div>
+          <div class="teamBody" id="team5"></div>
+        </div>
+      </div>
+
+      <div class="footNote">Clique sur un joueur, puis confirme le choix.</div>
+    </div>
   </div>
 
-  <div class="main">
-    <div class="panel">
-      <div class="panel-header">Capitaine au repêchage</div>
-      <div class="panel-body clock-card">
-        <div class="on-clock">ON THE CLOCK</div>
-        <div class="captain-name" id="captain">Francois Fortin</div>
-        <div class="next-pick">Prochain : <span id="nextCaptain">---</span></div>
-        <div class="team-color-line" id="teamColorLine"></div>
-        <div class="timer" id="timer">02:00</div>
-
-        <div class="controls">
-          <button class="btn-primary" onclick="if(!spectatorMode) start()">▶ Démarrer</button>
-          <button class="btn-secondary" onclick="if(!spectatorMode) pauseTimer()">⏸ Pause</button>
-          <button class="btn-secondary" onclick="if(!spectatorMode) resetTimer()">↺ Reset</button>
-          <button class="btn-danger" onclick="if(!spectatorMode) nextPickManual()">⏭ Passer</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-header">Derniers choix</div>
-      <div class="panel-body">
-        <div class="history-box" id="lastPickList"></div>
-      </div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-header">Joueurs disponibles</div>
-      <div class="panel-body">
-        <div class="players-list" id="players"></div>
-      </div>
+  <div class="announcementOverlay" id="announcementOverlay">
+    <div class="announcementCard">
+      <div class="announcementLights"></div>
+      <div class="announcementKicker">Avec ce choix...</div>
+      <div class="announcementTeam" id="announcementTeam">Les Verts</div>
+      <div class="announcementSub">sont fiers de sélectionner</div>
+      <div class="announcementPlayer" id="announcementPlayer">Maxime Cloutier</div>
+      <div class="announcementFooterLogo">Draft<small>Dek Hockey</small></div>
     </div>
   </div>
 
-  <div class="bottom">
-    <div class="teams-grid">
-      <div class="team-card">
-        <div class="team-header" style="background:#1565c0;">
-          Olivier Breton
-          <span class="team-sub">Bleu</span>
-        </div>
-        <div class="team-body" id="team0"></div>
-      </div>
+  <script>
+    const DEFAULT_TIME = 120;
 
-      <div class="team-card">
-        <div class="team-header" style="background:#c62828;">
-          Jordan Fecteau
-          <span class="team-sub">Rouge</span>
-        </div>
-        <div class="team-body" id="team1"></div>
-      </div>
+    const initialTeams = [
+      { name: "Olivier Breton", teamName: "Les Bleus", color: "#1e63ff", glow: "rgba(30,99,255,.45)", picks: ["Cédric Bégin"] },
+      { name: "Jordan Fecteau", teamName: "Les Rouges", color: "#c51c2b", glow: "rgba(197,28,43,.45)", picks: ["Alexis Gagné"] },
+      { name: "Francis Quirion", teamName: "Les Noirs", color: "#a9b3c2", glow: "rgba(255,255,255,.18)", picks: ["Pierre-Luc Lapointe"] },
+      { name: "Michael Breton", teamName: "Les Oranges", color: "#c96b12", glow: "rgba(201,107,18,.35)", picks: ["Alexandre Carrier"] },
+      { name: "William Gilbert", teamName: "Les Jaunes", color: "#d7a500", glow: "rgba(215,165,0,.35)", picks: ["Justin Richard"] },
+      { name: "Francois Fortin", teamName: "Les Verts", color: "#38d430", glow: "rgba(56,212,48,.45)", picks: ["Miguel Goupil"] }
+    ];
 
-      <div class="team-card">
-        <div class="team-header" style="background:#111111;">
-          Francis Quirion
-          <span class="team-sub">Noir</span>
-        </div>
-        <div class="team-body" id="team2"></div>
-      </div>
+    const initialPlayers = [
+      { name: "Olivier Beaudoin", pos: "A" },
+      { name: "Mickael Boisvert", pos: "A" },
+      { name: "Anthony Bolduc", pos: "D" },
+      { name: "Marc-André Bolduc", pos: "A" },
+      { name: "Maxime Boucher", pos: "A" },
+      { name: "Louis-David Boucher", pos: "A" },
+      { name: "Jimmy Boulet", pos: "A" },
+      { name: "Christain Boutin", pos: "A" },
+      { name: "Fancois Boutin", pos: "G" },
+      { name: "Michael Breton", pos: "A" },
+      { name: "Olivier Breton", pos: "D" },
+      { name: "Matys Carrier", pos: "A" },
+      { name: "Loick Champagne", pos: "A" },
+      { name: "Maxime Cloutier", pos: "A" },
+      { name: "Yannick Coulombe", pos: "D" },
+      { name: "Alexis Coulombe", pos: "D/A" },
+      { name: "David Coulombe", pos: "A" },
+      { name: "Jordan Feteau", pos: "A" },
+      { name: "Michael Filion", pos: "D" },
+      { name: "Francois Fortin", pos: "A" },
+      { name: "Sébastien Fortin", pos: "G" },
+      { name: "Jérimy Garant", pos: "A" },
+      { name: "William Gilbert", pos: "D" },
+      { name: "Félix Labé", pos: "A" },
+      { name: "Maverick Labonté", pos: "A" },
+      { name: "Caleb Labonté", pos: "A" },
+      { name: "Yannick Labonté", pos: "A" },
+      { name: "Francis Lacasse", pos: "A" },
+      { name: "Zachary Veilleux", pos: "A" },
+      { name: "Tommy Lachance", pos: "D" },
+      { name: "Pier-Olivier Morin", pos: "D" },
+      { name: "Pier-Olivier Paradis", pos: "G" },
+      { name: "Cedric Plante", pos: "A" },
+      { name: "Pier-Olivier Poulin", pos: "A" },
+      { name: "Cedric Quirion", pos: "A" },
+      { name: "Phillippe Quirion", pos: "A" },
+      { name: "Raphael Quirion", pos: "D" },
+      { name: "Francis Quirion", pos: "A" },
+      { name: "Anthony Roy", pos: "A" },
+      { name: "Samel Roy-Boucher", pos: "A" },
+      { name: "Steeven Tardif", pos: "G" },
+      { name: "Benoît Thibodeau", pos: "A/D" },
+      { name: "Dylan Pépin", pos: "A" },
+      { name: "Frédéric Poulin", pos: "A" },
+      { name: "Keven Fecteau", pos: "A" },
+      { name: "Yannick Tardif", pos: "A" },
+      { name: "Nathan Paradis", pos: "G" },
+      { name: "Xavier Arguin", pos: "A" },
+      { name: "Olivier Roy", pos: "A" },
+      { name: "Stéphane Roy", pos: "A" },
+      { name: "Maxime Labonté", pos: "G" },
+      { name: "Keven Couture", pos: "A" }
+    ];
 
-      <div class="team-card">
-        <div class="team-header" style="background:#ef6c00;">
-          Michael Breton
-          <span class="team-sub">Orange</span>
-        </div>
-        <div class="team-body" id="team3"></div>
-      </div>
+    const order = [5,4,3,2,1,0,0,1,2,3,4,5];
 
-      <div class="team-card">
-        <div class="team-header" style="background:#f9a825; color:#111;">
-          William Gilbert
-          <span class="team-sub" style="color:#222;">Jaune</span>
-        </div>
-        <div class="team-body" id="team4"></div>
-      </div>
+    let teams = JSON.parse(JSON.stringify(initialTeams));
+    let players = JSON.parse(JSON.stringify(initialPlayers));
 
-      <div class="team-card">
-        <div class="team-header" style="background:#2e7d32;">
-          Francois Fortin
-          <span class="team-sub">Vert</span>
-        </div>
-        <div class="team-body" id="team5"></div>
-      </div>
-    </div>
+    let time = DEFAULT_TIME;
+    let interval = null;
+    let currentPick = 0;
+    let selectedPlayer = null;
+    let selectedIndex = null;
 
-    <div class="footer-note">
-      Clique sur un joueur pour l’ajouter automatiquement à l’équipe en cours.
-    </div>
-  </div>
-
-<script>
-  const DEFAULT_TIME = 120;
-  const spectatorMode = window.location.search.includes("spectateur");
-
-  let time = DEFAULT_TIME;
-  let interval = null;
-  let currentPick = 0;
-
-  const teams = [
-    { name: "Olivier Breton", color: "#1565c0", picks: ["Cédric Bégin"] },
-    { name: "Jordan Fecteau", color: "#c62828", picks: ["Alexis Gagné"] },
-    { name: "Francis Quirion", color: "#111111", picks: ["Pierre-Luc Lapointe"] },
-    { name: "Michael Breton", color: "#ef6c00", picks: ["Alexandre Carrier"] },
-    { name: "William Gilbert", color: "#f9a825", picks: ["Justin Richard"] },
-    { name: "Francois Fortin", color: "#2e7d32", picks: ["Miguel Goupil"] }
-  ];
-
-  // Ordre serpentin après la ronde 1
-  const order = [5,4,3,2,1,0,0,1,2,3,4,5];
-
- 
-
-  // Joueurs disponibles seulement (sans les 6 déjà choisis)
-  let players = [
-    { name: "Olivier Beaudoin", pos: "A" },
-    { name: "Mickael Boisvert", pos: "A" },
-    { name: "Anthony Bolduc", pos: "D" },
-    { name: "Marc-André Bolduc", pos: "A" },
-    { name: "Maxime Boucher", pos: "A" },
-    { name: "Louis-David Boucher", pos: "A" },
-    { name: "Jimmy Boulet", pos: "A" },
-    { name: "Christain Boutin", pos: "A" },
-    { name: "Fancois Boutin", pos: "G" },
-    { name: "Michael Breton", pos: "A" },
-    { name: "Olivier Breton", pos: "D" },
-    { name: "Matys Carrier", pos: "A" },
-    { name: "Loick Champagne", pos: "A" },
-    { name: "Maxime Cloutier", pos: "A" },
-    { name: "Yannick Coulombe", pos: "D" },
-    { name: "Alexis Coulombe", pos: "D/A" },
-    { name: "David Coulombe", pos: "A" },
-    { name: "Jordan Feteau", pos: "A" },
-    { name: "Michael Filion", pos: "D" },
-    { name: "Francois Fortin", pos: "A" },
-    { name: "Sébastien Fortin", pos: "G" },
-    { name: "Jérimy Garant", pos: "A" },
-    { name: "William Gilbert", pos: "D" },
-    { name: "Félix Labé", pos: "A" },
-    { name: "Maverick Labonté", pos: "A" },
-    { name: "Caleb Labonté", pos: "A" },
-    { name: "Yannick Labonté", pos: "A" },
-    { name: "Francis Lacasse", pos: "A" },
-    { name: "Zachary Veilleux", pos: "A" },
-    { name: "Tommy Lachance", pos: "D" },
-    { name: "Pier-Olivier Morin", pos: "D" },
-    { name: "Pier-Olivier Paradis", pos: "G" },
-    { name: "Cedric Plante", pos: "A" },
-    { name: "Pier-Olivier Poulin", pos: "A" },
-    { name: "Cedric Quirion", pos: "A" },
-    { name: "Phillippe Quirion", pos: "A" },
-    { name: "Raphael Quirion", pos: "D" },
-    { name: "Francis Quirion", pos: "A" },
-    { name: "Anthony Roy", pos: "A" },
-    { name: "Samel Roy-Boucher", pos: "A" },
-    { name: "Steeven Tardif", pos: "G" },
-    { name: "Benoît Thibodeau", pos: "A/D" },
-    { name: "Dylan Pépin", pos: "A" },
-    { name: "Frédéric Poulin", pos: "A" },
-    { name: "Keven Fecteau", pos: "A" },
-    { name: "Yannick Tardif", pos: "A" },
-    { name: "Nathan Paradis", pos: "G" },
-    { name: "Xavier Arguin", pos: "A" },
-    { name: "Olivier Roy", pos: "A" },
-    { name: "Stéphane Roy", pos: "A" },
-    { name: "Maxime Labonté", pos: "G" },
-    { name: "Keven Couture", pos: "A" }
-  ];
-
-  window.addEventListener("DOMContentLoaded", () => {
-    if (spectatorMode) {
-      document.querySelectorAll("button").forEach(btn => {
-        btn.style.display = "none";
-      });
-      document.querySelector(".footer-note").innerText =
-        "Mode spectateur : affichage seulement.";
-    }
-  });
-
-  function renderTeams() {
-    for (let i = 0; i < teams.length; i++) {
-      const teamDiv = document.getElementById("team" + i);
-      teamDiv.innerHTML = "";
-
-      teams[i].picks.forEach((pick, index) => {
-        const el = document.createElement("div");
-        el.className = "pick";
-        el.innerHTML = `<span class="pick-number">Choix ${index + 1}</span>${pick}`;
-        teamDiv.appendChild(el);
-      });
-    }
-  }
-
-  function renderPickHistory() {
-    const box = document.getElementById("lastPickList");
-    box.innerHTML = "";
-
-    const recentPicks = pickHistory.slice().reverse();
-
-    recentPicks.forEach((pick, index) => {
-      const overallNumber = pickHistory.length - index;
-      const el = document.createElement("div");
-      el.className = "history-item";
-      el.innerHTML = `<strong>Choix ${overallNumber}</strong> — ${pick}`;
-      box.appendChild(el);
-    });
-  }
-
-  function updateCurrentCaptain() {
-    if (currentPick >= order.length) {
-      document.getElementById("captain").innerText = "Draft terminé";
-      document.getElementById("pickDisplay").innerText = "Repêchage terminé";
-      document.getElementById("nextCaptain").innerText = "---";
-      document.getElementById("teamColorLine").style.background = "#888";
-      document.getElementById("teamColorLine").style.boxShadow = "0 0 18px #888";
-      return;
+    function formatTime(t) {
+      const m = Math.floor(t / 60);
+      const s = t % 60;
+      return String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
     }
 
-    const teamIndex = order[currentPick];
-    const team = teams[teamIndex];
-
-    const overallPick = 7 + currentPick;
-    const roundNumber = Math.floor((overallPick - 1) / 6) + 1;
-
-    let nextText = "---";
-    if (currentPick + 1 < order.length) {
-      const nextTeamIndex = order[currentPick + 1];
-      nextText = teams[nextTeamIndex].name;
+    function updateTimer() {
+      const el = document.getElementById("timer");
+      el.innerText = formatTime(time);
+      el.classList.toggle("warning", time <= 10);
     }
 
-    document.getElementById("captain").innerText = team.name;
-    document.getElementById("nextCaptain").innerText = nextText;
-    document.getElementById("pickDisplay").innerText =
-      "Ronde " + roundNumber + " • Choix " + overallPick;
-
-    document.getElementById("teamColorLine").style.background = team.color;
-    document.getElementById("teamColorLine").style.boxShadow = "0 0 18px " + team.color;
-  }
-
-  function updateTimer() {
-    const timerEl = document.getElementById("timer");
-    const minutes = Math.floor(time / 60);
-    const seconds = time % 60;
-
-    timerEl.innerText =
-      String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
-
-    if (time <= 10) {
-      timerEl.classList.add("warning");
-    } else {
-      timerEl.classList.remove("warning");
+    function start() {
+      if (currentPick >= order.length) return;
+      clearInterval(interval);
+      interval = setInterval(() => {
+        time--;
+        if (time < 0) time = 0;
+        updateTimer();
+        if (time <= 0) clearInterval(interval);
+      }, 1000);
     }
-  }
 
-  function start() {
-    if (currentPick >= order.length) return;
-    clearInterval(interval);
-    interval = setInterval(() => {
-      time--;
+    function pauseTimer() {
+      clearInterval(interval);
+    }
+
+    function resetTimer() {
+      clearInterval(interval);
+      time = DEFAULT_TIME;
       updateTimer();
-      if (time <= 0) {
-        clearInterval(interval);
-        time = 0;
-        updateTimer();
+    }
+
+    function nextPickManual() {
+      cancelPick();
+      clearInterval(interval);
+      currentPick++;
+      time = DEFAULT_TIME;
+      updateCurrentCaptain();
+      updateTimer();
+    }
+
+    function updateCurrentCaptain() {
+      if (currentPick >= order.length) {
+        document.getElementById("captain").innerText = "Draft terminé";
+        document.getElementById("teamNameCurrent").innerText = "---";
+        document.getElementById("nextCaptain").innerText = "---";
+        document.getElementById("pickDisplay").innerText = "Repêchage terminé";
+        document.getElementById("teamColorLine").style.background = "#777";
+        document.getElementById("teamColorLine").style.boxShadow = "0 0 14px rgba(255,255,255,.18)";
+        return;
       }
-    }, 1000);
-  }
 
-  function pauseTimer() {
-    clearInterval(interval);
-  }
+      const teamIndex = order[currentPick];
+      const team = teams[teamIndex];
+      const overallPick = 7 + currentPick;
+      const roundNumber = Math.floor((overallPick - 1) / 6) + 1;
 
-  function resetTimer() {
-    clearInterval(interval);
-    time = DEFAULT_TIME;
-    updateTimer();
-  }
+      let nextName = "---";
+      if (currentPick + 1 < order.length) {
+        nextName = teams[order[currentPick + 1]].name;
+      }
 
-  function nextPickManual() {
-    clearInterval(interval);
-    currentPick++;
-    time = DEFAULT_TIME;
-    updateTimer();
-    updateCurrentCaptain();
-  }
+      document.getElementById("captain").innerText = team.name;
+      document.getElementById("teamNameCurrent").innerText = team.teamName;
+      document.getElementById("nextCaptain").innerText = nextName;
+      document.getElementById("pickDisplay").innerText = `Ronde ${roundNumber} • Choix ${overallPick}`;
 
-  function renderPlayers() {
-    const div = document.getElementById("players");
-    div.innerHTML = "";
+      const line = document.getElementById("teamColorLine");
+      line.style.background = team.color;
+      line.style.boxShadow = `0 0 14px ${team.glow}`;
+    }
 
-    players.forEach((player, i) => {
-      const el = document.createElement("div");
-      el.className = "player";
-      el.innerHTML = `${player.name}<small>Position : ${player.pos}</small>`;
+    function renderTeams() {
+      teams.forEach((team, i) => {
+        const body = document.getElementById("team" + i);
+        body.innerHTML = "";
+        team.picks.forEach((pick, index) => {
+          const div = document.createElement("div");
+          div.className = "pickLine";
+          div.innerText = `${index + 1}. ${pick}`;
+          body.appendChild(div);
+        });
+      });
+    }
 
-      el.onclick = () => {
-        if (spectatorMode) return;
-        if (currentPick >= order.length) return;
+    function posClass(pos) {
+      if (pos === "A") return "pos-A";
+      if (pos === "D") return "pos-D";
+      if (pos === "G") return "pos-G";
+      return "pos-M";
+    }
 
-        const teamIndex = order[currentPick];
-        teams[teamIndex].picks.push(player.name);
+    function renderPlayers() {
+      const wrap = document.getElementById("players");
+      wrap.innerHTML = "";
 
-        pickHistory.push(teams[teamIndex].name + " sélectionne " + player.name);
+      players.forEach((player, i) => {
+        const row = document.createElement("div");
+        row.className = "playerRow";
+        if (selectedIndex === i && selectedPlayer?.name === player.name) {
+          row.classList.add("selected");
+        }
 
-        players.splice(i, 1);
-        renderPlayers();
-        renderTeams();
-        renderPickHistory();
+        row.innerHTML = `
+          <div class="playerName">${player.name}</div>
+          <div class="pos ${posClass(player.pos)}">${player.pos}</div>
+        `;
 
-        clearInterval(interval);
-        time = DEFAULT_TIME;
-        updateTimer();
+        row.onclick = () => {
+          selectedPlayer = player;
+          selectedIndex = i;
+          document.getElementById("selectedPlayerName").innerText = player.name;
+          renderPlayers();
+        };
 
-        currentPick++;
-        updateCurrentCaptain();
-      };
+        wrap.appendChild(row);
+      });
+    }
 
-      div.appendChild(el);
+    function setLastPick(team, playerName) {
+      const overallNumber = 6 + currentPick + 1;
+      document.getElementById("lastPickNumber").innerText = `Choix ${overallNumber}`;
+      document.getElementById("lastPickText").innerText = `${team.teamName} sont fiers de sélectionner`;
+      document.getElementById("lastPickPlayer").innerText = playerName;
+      document.getElementById("lastPickPlayer").style.color = team.color;
+      document.getElementById("lastPickPlayer").style.textShadow = `0 0 14px ${team.glow}`;
+    }
+
+    function showAnnouncement(team, playerName) {
+      document.getElementById("announcementTeam").innerText = team.teamName;
+      document.getElementById("announcementTeam").style.color = team.color;
+      document.getElementById("announcementPlayer").innerText = playerName;
+      document.getElementById("announcementPlayer").style.boxShadow = `inset 0 0 18px rgba(255,255,255,.05), 0 0 18px ${team.glow}`;
+      document.getElementById("announcementOverlay").classList.add("show");
+    }
+
+    function closeAnnouncement() {
+      document.getElementById("announcementOverlay").classList.remove("show");
+    }
+
+    function confirmPick() {
+      if (!selectedPlayer || currentPick >= order.length) return;
+
+      const teamIndex = order[currentPick];
+      const team = teams[teamIndex];
+      const playerName = selectedPlayer.name;
+
+      team.picks.push(playerName);
+      players.splice(selectedIndex, 1);
+
+      setLastPick(team, playerName);
+      renderTeams();
+      cancelPick();
+      renderPlayers();
+      showAnnouncement(team, playerName);
+
+      clearInterval(interval);
+      currentPick++;
+      time = DEFAULT_TIME;
+      updateCurrentCaptain();
+      updateTimer();
+      start();
+    }
+
+    function cancelPick() {
+      selectedPlayer = null;
+      selectedIndex = null;
+      document.getElementById("selectedPlayerName").innerText = "---";
+      renderPlayers();
+    }
+
+    function resetDraft() {
+      if (!confirm("Es-tu certain de vouloir remettre le draft à zéro ?")) return;
+
+      clearInterval(interval);
+      teams = JSON.parse(JSON.stringify(initialTeams));
+      players = JSON.parse(JSON.stringify(initialPlayers));
+      time = DEFAULT_TIME;
+      currentPick = 0;
+      selectedPlayer = null;
+      selectedIndex = null;
+
+      document.getElementById("selectedPlayerName").innerText = "---";
+      document.getElementById("lastPickNumber").innerText = "Choix 6";
+      document.getElementById("lastPickText").innerText = "Les Verts sont fiers de sélectionner";
+      document.getElementById("lastPickPlayer").innerText = "Miguel Goupil";
+      document.getElementById("lastPickPlayer").style.color = initialTeams[5].color;
+      document.getElementById("lastPickPlayer").style.textShadow = `0 0 14px ${initialTeams[5].glow}`;
+
+      closeAnnouncement();
+      renderTeams();
+      renderPlayers();
+      updateCurrentCaptain();
+      updateTimer();
+    }
+
+    document.getElementById("announcementOverlay").addEventListener("click", (e) => {
+      if (e.target.id === "announcementOverlay") closeAnnouncement();
     });
-  }
 
-  renderTeams();
-  renderPlayers();
-  renderPickHistory();
-  updateTimer();
-  updateCurrentCaptain();
-</script>
+    renderTeams();
+    renderPlayers();
+    updateCurrentCaptain();
+    updateTimer();
+    setLastPick(initialTeams[5], "Miguel Goupil");
+  </script>
 </body>
 </html>
