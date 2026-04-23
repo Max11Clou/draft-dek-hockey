@@ -841,7 +841,7 @@
     function renderPlayers() {
       const wrap = document.getElementById("players");
       wrap.innerHTML = "";
-
+players.sort((a, b) => a.name.localeCompare(b.name, 'fr'));
       players.forEach((player, i) => {
         const row = document.createElement("div");
         row.className = "playerRow";
